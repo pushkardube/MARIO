@@ -20,32 +20,18 @@
     <texture name="skybox" type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0.0 0.0 0.0"
              width="512" height="3072"/>
 
-    <mesh name="59" file="59.stl"/>
-    <mesh name="63" file="63.stl"/>
-    <mesh name="67" file="67.stl"/>
-    <mesh name="71" file="71.stl"/>
-    <mesh name="75" file="75.stl"/>
-    <mesh name="82" file="82.stl"/>
-    <mesh name="86" file="86.stl"/>
-    <mesh name="102" file="102.stl"/>
-    <mesh name="109" file="109.stl"/>
-    <mesh name="113" file="113.stl"/>
-    <mesh name="816" file="816.stl"/>
-    <mesh name="820" file="820.stl"/>
-    <mesh name="824" file="824.stl"/>
-    <mesh name="828" file="828.stl"/>
-    <mesh name="832" file="832.stl"/>
-    <mesh name="836" file="836.stl"/>
-    <mesh name="840" file="840.stl"/>
-    <mesh name="5983" file="5983.stl"/>
-    <mesh name="5987" file="5987.stl"/>
-    <mesh name="5991" file="5991.stl"/>
+    <mesh name="base_link"    file="base_link_set_zero.stl"/>
+    <mesh name="link_1"       file="link_1_set_zero.stl"/>
+    <mesh name="link_2"       file="link_2_set_zero.stl"/>
+    <mesh name="link_3"       file="link_3_set_zero.stl"/>
+    <mesh name="right_gripper" file="right_gripper_set_zero.stl"/>
+    <mesh name="left_gripper"  file="left_gripper_set_zero.stl"/>
 
-    <material name="gray" rgba="0.627 0.627 0.627 1"/>
-    <material name="blue" rgba="0.792 0.820 0.933 1"/>
-    <material name="silver" rgba="0.776 0.757 0.737 1"/>
-    <material name="white" rgba="0.917 0.917 0.917 1"/>
-    <material name="teal" rgba="0.047 0.471 0.435 1"/>
+    <material name="gray"      rgba="0.627 0.627 0.627 1"/>
+    <material name="blue"      rgba="0.792 0.820 0.933 1"/>
+    <material name="silver"    rgba="0.776 0.757 0.737 1"/>
+    <material name="white"     rgba="0.917 0.917 0.917 1"/>
+    <material name="teal"      rgba="0.047 0.471 0.435 1"/>
     <material name="dark_blue" rgba="0.231 0.380 0.706 1"/>
   </asset>
 
@@ -58,94 +44,61 @@
 
     <geom name="floor" type="plane" size="2 2 0.1" material="grid" condim="3"/>
 
+    <!-- base_link at world origin; mesh vertices already in world space at zero config -->
     <body name="base_link" pos="0 0 0">
-      <inertial pos="-0.000462 0.000312 0.033857" mass="0.200"
-                diaginertia="1.5e-04 1.5e-04 8.0e-05"/>
-        <geom type="mesh" mesh="82" pos="0.049865 0.049880 0.000000" quat="0.000001 -0.000000 0.000000 -1.000000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="82" pos="0.049865 0.049880 0.000000" quat="0.000001 -0.000000 0.000000 -1.000000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="113" pos="-0.049865 -0.049880 0.053000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="113" pos="-0.049865 -0.049880 0.053000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="-0.041865 0.041880 0.003000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="-0.041865 0.041880 0.003000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="0.041865 0.041880 0.003000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="0.041865 0.041880 0.003000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="0.041865 -0.041880 0.003000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="0.041865 -0.041880 0.003000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="-0.041865 -0.041880 0.003000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="59" pos="-0.041865 -0.041880 0.003000" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="67" pos="-0.020962 -0.009850 0.026400" quat="0.707105 0.707108 0.000000 -0.000000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="67" pos="-0.020962 -0.009850 0.026400" quat="0.707105 0.707108 0.000000 -0.000000" material="gray" group="1" contype="0" conaffinity="0"/>
+      <inertial pos="0 0 0.04" mass="0.200" diaginertia="1.5e-04 1.5e-04 8.0e-05"/>
+      <geom type="mesh" mesh="base_link" pos="0 0 0" material="gray" contype="0" conaffinity="0"/>
+      <geom type="mesh" mesh="base_link" pos="0 0 0" material="gray" group="1" contype="0" conaffinity="0"/>
 
-      <body name="link_1" pos="-0.010962 0.000150 0.072900" quat="0.540840 0.000003 0.000001 0.841126">
-        <inertial pos="0.002822 -0.038226 0.048707" mass="0.100"
-                  diaginertia="8.0e-05 8.0e-05 4.0e-05"/>
-        <joint name="joint_1" type="hinge" axis="0.0000 -0.0000 1.0000"
+      <!-- joint_1 (base rotation): world pos [-0.011, 0.0001, 0.0729], axis z -->
+      <body name="link_1" pos="-0.011 0.0001 0.0729">
+        <inertial pos="0 0 0" mass="0.100" diaginertia="8.0e-05 8.0e-05 4.0e-05"/>
+        <joint name="joint_1" type="hinge" axis="0 0 -1"
                range="-3.14 3.14" damping="2.0" armature="0.05"/>
-        <geom type="mesh" mesh="63" pos="-0.000000 -0.000000 -0.003000" material="white" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="63" pos="-0.000000 -0.000000 -0.003000" material="white" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5991" pos="-0.017405 -0.059568 -0.003000" quat="0.707105 0.000000 -0.000000 0.707108" material="white" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5991" pos="-0.017405 -0.059568 -0.003000" quat="0.707105 0.000000 -0.000000 0.707108" material="white" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="75" pos="0.002851 -0.003976 0.072912" quat="0.457757 -0.538943 0.457761 -0.538938" material="teal" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="75" pos="0.002851 -0.003976 0.072912" quat="0.457757 -0.538943 0.457761 -0.538938" material="teal" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="71" pos="-0.001749 -0.022559 0.075768" quat="0.538939 0.457760 0.538943 0.457756" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="71" pos="-0.001749 -0.022559 0.075768" quat="0.538939 0.457760 0.538943 0.457756" material="gray" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="109" pos="0.004351 -0.080184 0.085218" quat="0.762178 0.647368 0.000002 -0.000004" material="blue" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="109" pos="0.004351 -0.080184 0.085218" quat="0.762178 0.647368 0.000002 -0.000004" material="blue" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="816" pos="0.004401 -0.095980 0.085326" quat="0.081181 0.996699 0.000000 -0.000006" material="white" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="816" pos="0.004401 -0.095980 0.085326" quat="0.081181 0.996699 0.000000 -0.000006" material="white" group="1" contype="0" conaffinity="0"/>
+        <!-- geom offset = -joint_1_world -->
+        <geom type="mesh" mesh="link_1" pos="0.011 -0.0001 -0.0729" material="white" contype="0" conaffinity="0"/>
+        <geom type="mesh" mesh="link_1" pos="0.011 -0.0001 -0.0729" material="white" group="1" contype="0" conaffinity="0"/>
 
-        <body name="link_2" pos="0.005851 -0.022559 0.075768" quat="0.682880 0.183518 -0.682875 -0.183517">
-          <inertial pos="-0.013084 0.000063 -0.010044" mass="0.030"
-                    diaginertia="1.5e-05 1.5e-05 5.0e-06"/>
-          <joint name="joint_2" type="hinge" axis="-0.501284 0.865283 0.0"
+        <!-- joint_2 (shoulder): world pos [-0.0105, -0.0141, 0.1089], axis -y -->
+        <!-- local pos = joint_2_world - joint_1_world -->
+        <body name="link_2" pos="0.0005 -0.0142 0.036">
+          <inertial pos="0 0 0" mass="0.030" diaginertia="1.5e-05 1.5e-05 5.0e-06"/>
+          <joint name="joint_2" type="hinge" axis="0 1 0"
                  range="-3.14 3.14" damping="3.0" armature="0.08"/>
-        <geom type="mesh" mesh="86" pos="0.004500 0.000000 -0.026500" material="white" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="86" pos="0.004500 0.000000 -0.026500" material="white" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="102" pos="-0.046000 0.000000 -0.008400" quat="0.707105 -0.707108 -0.000000 0.000000" material="blue" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="102" pos="-0.046000 0.000000 -0.008400" quat="0.707105 -0.707108 -0.000000 0.000000" material="blue" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="71" pos="-0.046000 0.000000 -0.007000" quat="0.000000 0.000001 0.000000 1.000000" material="gray" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="71" pos="-0.046000 0.000000 -0.007000" quat="0.000000 0.000001 0.000000 1.000000" material="gray" group="1" contype="0" conaffinity="0"/>
+          <!-- geom offset = -joint_2_world -->
+          <geom type="mesh" mesh="link_2" pos="0.0105 0.0141 -0.1089" material="blue" contype="0" conaffinity="0"/>
+          <geom type="mesh" mesh="link_2" pos="0.0105 0.0141 -0.1089" material="blue" group="1" contype="0" conaffinity="0"/>
 
-          <body name="link_3" pos="-0.046000 0.000000 -0.008400" quat="0.259535 -0.000002 0.000000 -0.965734">
-            <inertial pos="0.012463 -0.001749 -0.010192" mass="0.030"
-                      diaginertia="1.5e-05 1.5e-05 5.0e-06"/>
-            <joint name="joint_3" type="hinge" axis="0.0 -1.0 0.0"
+          <!-- joint_3 (elbow): world pos [-0.0565, -0.0057, 0.1088], axis -z -->
+          <!-- local pos = joint_3_world - joint_2_world -->
+          <body name="link_3" pos="-0.046 0.0084 -0.0001">
+            <inertial pos="0 0 0" mass="0.030" diaginertia="1.5e-05 1.5e-05 5.0e-06"/>
+            <joint name="joint_3" type="hinge" axis="0 -1 0"
                    range="-3.14 3.14" damping="2.0" armature="0.05"/>
-        <geom type="mesh" mesh="86" pos="0.004500 -0.000000 -0.026500" material="white" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="86" pos="0.004500 -0.000000 -0.026500" material="white" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5987" pos="-0.000572 -0.048832 -0.005400" quat="0.000001 0.707105 -0.707108 -0.000001" material="silver" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5987" pos="-0.000572 -0.048832 -0.005400" quat="0.000001 0.707105 -0.707108 -0.000001" material="silver" group="1" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5983" pos="0.049876 -0.035500 -0.058841" quat="0.000002 0.000004 0.707105 0.707108" material="blue" contype="0" conaffinity="0"/>
-        <geom type="mesh" mesh="5983" pos="0.049876 -0.035500 -0.058841" quat="0.000002 0.000004 0.707105 0.707108" material="blue" group="1" contype="0" conaffinity="0"/>
+            <!-- geom offset = -joint_3_world -->
+            <geom type="mesh" mesh="link_3" pos="0.0565 0.0057 -0.1088" material="silver" contype="0" conaffinity="0"/>
+            <geom type="mesh" mesh="link_3" pos="0.0565 0.0057 -0.1088" material="silver" group="1" contype="0" conaffinity="0"/>
 
-            <body name="claw_right" pos="-0.051558 0.109881 0.006222" quat="0.706199 -0.078911 0.702688 0.035840">
-              <inertial pos="0 0.01 0.0015" mass="0.005"
-                        diaginertia="1.0e-06 1.0e-06 1.0e-06"/>
-              <joint name="joint_4" type="hinge" axis="-0.9868 -0.1618 0.0000"
+            <!-- right gripper: world pos [-0.0798, -0.0079, 0.0243], axis -z -->
+            <!-- local pos = right_gripper_world - joint_3_world -->
+            <body name="claw_right" pos="-0.0233 -0.0022 -0.0845">
+              <inertial pos="0 0 0" mass="0.005" diaginertia="1.0e-06 1.0e-06 1.0e-06"/>
+              <joint name="joint_4" type="hinge" axis="0 0 -1"
                      range="-0.8 0.8" damping="0.2" armature="0.005"/>
-              <geom type="mesh" mesh="824" pos="0.003629 -0.013580 0.000000" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="824" pos="0.003629 -0.013580 0.000000" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="820" pos="-0.002849 -0.013168 -0.000000" quat="0.998132 0.000000 0.000000 0.061086" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="820" pos="-0.002849 -0.013168 -0.000000" quat="0.998132 0.000000 0.000000 0.061086" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="828" pos="-0.004010 -0.013888 -0.003000" quat="0.999533 0.000000 -0.000000 0.030558" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="828" pos="-0.004010 -0.013888 -0.003000" quat="0.999533 0.000000 -0.000000 0.030558" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="832" pos="-0.001570 -0.013739 0.003000" quat="0.999533 -0.000000 -0.000000 0.030572" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="832" pos="-0.001570 -0.013739 0.003000" quat="0.999533 -0.000000 -0.000000 0.030572" material="dark_blue" group="1" contype="0" conaffinity="0"/>
+              <!-- geom offset = -right_gripper_world -->
+              <geom type="mesh" mesh="right_gripper" pos="0.0798 0.0079 -0.0243" material="dark_blue" contype="0" conaffinity="0"/>
+              <geom type="mesh" mesh="right_gripper" pos="0.0798 0.0079 -0.0243" material="dark_blue" group="1" contype="0" conaffinity="0"/>
             </body>
 
-            <body name="claw_left" pos="-0.051558 0.109880 0.013480" quat="0.702690 -0.035838 0.706197 0.078913">
-              <inertial pos="0 0.01 0.0015" mass="0.005"
-                        diaginertia="1.0e-06 1.0e-06 1.0e-06"/>
-              <joint name="joint_5" type="hinge" axis="0.9868 0.1618 -0.0000"
+            <!-- left gripper: world pos [-0.0798, -0.0006, 0.0243], axis +z -->
+            <!-- local pos = left_gripper_world - joint_3_world -->
+            <body name="claw_left" pos="-0.0233 0.0051 -0.0845">
+              <inertial pos="0 0 0" mass="0.005" diaginertia="1.0e-06 1.0e-06 1.0e-06"/>
+              <joint name="joint_5" type="hinge" axis="0 0 1"
                      range="-0.8 0.8" damping="0.2" armature="0.005"/>
-              <geom type="mesh" mesh="840" pos="-0.003629 -0.013580 -0.000000" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="840" pos="-0.003629 -0.013580 -0.000000" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="836" pos="0.002849 -0.013168 0.000000" quat="0.998133 -0.000000 -0.000000 -0.061085" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="836" pos="0.002849 -0.013168 0.000000" quat="0.998133 -0.000000 -0.000000 -0.061085" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="828" pos="0.001571 -0.013739 0.003000" quat="0.999533 -0.000000 -0.000000 -0.030557" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="828" pos="0.001571 -0.013739 0.003000" quat="0.999533 -0.000000 -0.000000 -0.030557" material="dark_blue" group="1" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="832" pos="0.004011 -0.013888 -0.003000" quat="0.999533 -0.000000 -0.000000 -0.030543" material="dark_blue" contype="0" conaffinity="0"/>
-              <geom type="mesh" mesh="832" pos="0.004011 -0.013888 -0.003000" quat="0.999533 -0.000000 -0.000000 -0.030543" material="dark_blue" group="1" contype="0" conaffinity="0"/>
+              <!-- geom offset = -left_gripper_world -->
+              <geom type="mesh" mesh="left_gripper" pos="0.0798 0.0006 -0.0243" material="dark_blue" contype="0" conaffinity="0"/>
+              <geom type="mesh" mesh="left_gripper" pos="0.0798 0.0006 -0.0243" material="dark_blue" group="1" contype="0" conaffinity="0"/>
             </body>
           </body>
         </body>
@@ -154,11 +107,11 @@
   </worldbody>
 
   <actuator>
-    <position name="joint_1_actuator" joint="joint_1" kp="80" kv="8" ctrlrange="-3.14 3.14"/>
+    <position name="joint_1_actuator" joint="joint_1" kp="80"  kv="8"  ctrlrange="-3.14 3.14"/>
     <position name="joint_2_actuator" joint="joint_2" kp="150" kv="15" ctrlrange="-3.14 3.14"/>
     <position name="joint_3_actuator" joint="joint_3" kp="100" kv="10" ctrlrange="-3.14 3.14"/>
-    <position name="joint_4_actuator" joint="joint_4" kp="20" kv="1" ctrlrange="-0.8 0.8"/>
-    <position name="joint_5_actuator" joint="joint_5" kp="20" kv="1" ctrlrange="-0.8 0.8"/>
+    <position name="joint_4_actuator" joint="joint_4" kp="20"  kv="1"  ctrlrange="-0.8 0.8"/>
+    <position name="joint_5_actuator" joint="joint_5" kp="20"  kv="1"  ctrlrange="-0.8 0.8"/>
   </actuator>
 
   <sensor>

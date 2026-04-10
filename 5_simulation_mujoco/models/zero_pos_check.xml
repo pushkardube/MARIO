@@ -1,0 +1,32 @@
+<mujoco model="zero_check">
+  <compiler angle="radian" meshdir="../meshes" autolimits="true"/>
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <global azimuth="120" elevation="-20"/>
+  </visual>
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512"
+             rgb1="0.1 0.2 0.3" rgb2="0.2 0.3 0.4"/>
+    <material name="grid" texture="grid" texrepeat="16 16" texuniform="true" reflectance="0.2"/>
+    <mesh name="base_link" file="base_link_set_zero.stl"/>
+    <mesh name="link_1" file="link_1_set_zero.stl"/>
+    <mesh name="link_2" file="link_2_set_zero.stl"/>
+    <mesh name="link_3" file="link_3_set_zero.stl"/>
+    <mesh name="right_gripper" file="right_gripper_set_zero.stl"/>
+    <mesh name="left_gripper" file="left_gripper_set_zero.stl"/>
+    <material name="gray" rgba="0.627 0.627 0.627 1"/>
+    <material name="white" rgba="0.917 0.917 0.917 1"/>
+    <material name="blue" rgba="0.792 0.820 0.933 1"/>
+    <material name="silver" rgba="0.776 0.757 0.737 1"/>
+    <material name="dark_blue" rgba="0.231 0.380 0.706 1"/>
+  </asset>
+  <worldbody>
+    <geom name="floor" type="plane" size="2 2 0.1" material="grid" condim="3"/>
+    <geom type="mesh" mesh="base_link" material="gray"/>
+    <geom type="mesh" mesh="link_1" material="white"/>
+    <geom type="mesh" mesh="link_2" material="blue"/>
+    <geom type="mesh" mesh="link_3" material="silver"/>
+    <geom type="mesh" mesh="right_gripper" material="dark_blue"/>
+    <geom type="mesh" mesh="left_gripper" material="dark_blue"/>
+  </worldbody>
+</mujoco>
