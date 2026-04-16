@@ -88,7 +88,13 @@ banner "Installing ROS 2 Humble"
 
 mamba install -n ros2_mario -y \
     ros-humble-desktop \
-    colcon-common-extensions
+    colcon-common-extensions \
+    ros-humble-kdl-parser
+
+# Force-reinstall urdfdom_headers so its cmake config files are written to disk.
+# On a fresh conda install the cmake config is sometimes missing despite the package
+# being listed as installed, which breaks simulation_mujoco's cmake configuration.
+mamba install -n ros2_mario -y --force-reinstall urdfdom_headers
 
 # ── 6. Python packages ────────────────────────────────────────────────────────
 banner "Installing Python packages"
@@ -125,10 +131,30 @@ for pkg in 1_chatter_listener 2_simulation_dh 3_simulation_rerun; do
     fi
 done
 
-# Ensure all Python scripts and launch files are executable (required for ros2 run)
-find "$HOME/MARIO" \( -path "*/scripts/*.py" -o -path "*/launch/*.py" \) -exec chmod +x {} \;
+# Ensure all Python scripts and launch files are executable (required for ros2 run).
+# Prune build/install/log to avoid chasing broken symlinks from old colcon installs.
+find "$HOME/MARIO" \
+    -not -path "$HOME/MARIO/build/*" \
+    -not -path "$HOME/MARIO/install/*" \
+    -not -path "$HOME/MARIO/log/*" \
+    \( -path "*/scripts/*.py" -o -path "*/launch/*.py" \) \
+    -exec chmod +x {} \+
 
 cd "$HOME/ros2_mario_ws"
+
+# Remove build dirs for packages that were renamed or had failed cmake runs.
+# Stale cmake state causes "Makefile: No such file or directory" on the next build.
+for stale_pkg in simulation_rviz; do
+    rm -rf build/"$stale_pkg" install/"$stale_pkg"
+done
+for pkg_build_dir in build/*/; do
+    rc_file="${pkg_build_dir}colcon_build.rc"
+    if [ -f "$rc_file" ] && [ "$(cat "$rc_file" | tr -d '[:space:]')" != "0" ]; then
+        echo "  Cleaning failed build state: $(basename "$pkg_build_dir")"
+        rm -rf "$pkg_build_dir"
+    fi
+done
+
 conda run -n ros2_mario colcon build --symlink-install
 
 if ! grep -q "ros2_mario_ws/install/setup" "$HOME/.${_shell_}rc" 2>/dev/null; then
