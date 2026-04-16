@@ -131,14 +131,16 @@ for pkg in 1_chatter_listener 2_simulation_dh 3_simulation_rerun; do
     fi
 done
 
-# Ensure all Python scripts and launch files are executable (required for ros2 run).
+# Ensure all Python scripts and launch files are executable (required for ros2 run on Mac).
+# Also fix any remaining #!/usr/bin/python3 shebangs to #!/usr/bin/env python3.
 # Prune build/install/log to avoid chasing broken symlinks from old colcon installs.
 find "$HOME/MARIO" \
     -not -path "$HOME/MARIO/build/*" \
     -not -path "$HOME/MARIO/install/*" \
     -not -path "$HOME/MARIO/log/*" \
     \( -path "*/scripts/*.py" -o -path "*/launch/*.py" \) \
-    -exec chmod +x {} \+
+    -exec chmod +x {} \+ \
+    -exec sed -i '' '1s|#!/usr/bin/python3|#!/usr/bin/env python3|' {} \;
 
 cd "$HOME/ros2_mario_ws"
 

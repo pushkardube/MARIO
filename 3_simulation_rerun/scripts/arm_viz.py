@@ -14,10 +14,6 @@ from ament_index_python.packages import get_package_share_directory
 
 MESH_DIR = Path(get_package_share_directory("simulation_rerun")) / "meshes"
 
-# Physical limit of the gripper mechanism — servo can go to 180° electrically but
-# the claw hits a hard stop well before that. Increase slowly until servo stops fighting.
-GRIPPER_MAX_DEG = 45.0
-
 GRAY   = [160, 160, 160, 255]
 BLUE   = [202, 209, 238, 255]
 SILVER = [198, 193, 188, 255]
@@ -88,25 +84,27 @@ class ArmVisualizer(Node):
         for entity, mesh in self.meshes.items():
             rr.log(entity, mesh, static=True)
 
-    def publish_and_visualize(self, theta_base, theta_shoulder, theta_elbow, theta_wrist):
-        # claw_right = wrist angle, claw_left mirrors it
-        rad = [a * math.pi / 180.0 for a in
-               [theta_base, theta_shoulder, theta_elbow, theta_wrist, theta_wrist]]
+    def publish_and_visualize(self, theta_base, theta_shoulder, theta_elbow, gripper_open):
+        rad = [a * math.pi / 180.0 for a in [theta_base, theta_shoulder, theta_elbow]]
+        # Firmware: set_angle_servo(&servo_a, (1.57 - data[3]) * 180/pi)
+        # open=1  → send 1.57 → servo at 0°
+        # closed=0 → send 0.0 → servo at 90°
+        gripper_rad = math.pi / 2 if gripper_open else 0.0
 
         msg = JointState()
         msg.header = Header()
         msg.header.stamp = self.get_clock().now().to_msg()
-        # 4 names match the 4 physical servos (a=base, b=shoulder, c=elbow, d=gripper).
-        # rad[4] (claw_left mirror) is only used for rerun visualization below.
-        msg.name = ["gripper", "elbow", "shoulder", "base"]
-        msg.position = [round(r, 4) for r in [rad[3], rad[2], rad[1], rad[0]]]
+        msg.name = ["base", "shoulder", "elbow", "gripper"]
+        msg.position = [round(r, 4) for r in [rad[0], rad[1], rad[2], gripper_rad]]
         msg.velocity = []
         msg.effort = []
         self.pub.publish(msg)
         print(f"  -> base={theta_base:.1f} shoulder={theta_shoulder:.1f} "
-              f"elbow={theta_elbow:.1f} wrist={theta_wrist:.1f}")
+              f"elbow={theta_elbow:.1f} gripper={'open' if gripper_open else 'closed'}")
 
-        transforms = fk(*rad)
+        # Visualization: use gripper_rad/2 as visual claw angle so it looks right
+        vis_claw = gripper_rad / 2
+        transforms = fk(rad[0], rad[1], rad[2], vis_claw, vis_claw)
         rr.set_time("pose", sequence=self.step)
         for (entity, *_), T in zip(LINKS, transforms):
             rr.log(entity, rr.Transform3D(translation=T[:3, 3], mat3x3=T[:3, :3]))
@@ -132,13 +130,12 @@ def input_loop(node, stop_event):
         if wrist_in not in ("0", "1"):
             print("  ! gripper must be 0 (closed) or 1 (open)")
             continue
-        wrist = GRIPPER_MAX_DEG if wrist_in == "1" else 0.0
 
         if not all(0.0 <= a <= 180.0 for a in [base, shoulder, elbow]):
             print("  ! base/shoulder/elbow must be in [0, 180]")
             continue
 
-        node.publish_and_visualize(base, shoulder, elbow, wrist)
+        node.publish_and_visualize(base, shoulder, elbow, wrist_in == "1")
         print("  published.")
 
 

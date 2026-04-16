@@ -1,14 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 import inverse_kinematics_module
 from std_msgs.msg import Float64MultiArray
-from rclpy import qos
 import math
 import sys
 
 def inverse_kinematics_publisher():
-    Joints = node.create_publisher(Float64MultiArray, '/forward_position_controller/commands',qos_profile=qos.qos_profile_parameter_events)
+    global Joints
     joint = Float64MultiArray()
     joint.data = [0.0,0.0,0.0,0.0,0.0]
 
@@ -70,8 +69,9 @@ def inverse_kinematics_publisher():
 if __name__ == '__main__':
 
     rclpy.init(args=sys.argv)
-    global node 
+    global node, Joints
     node = Node('inverse_kinematics_publisher')
+    Joints = node.create_publisher(Float64MultiArray, '/forward_position_controller/commands', 10)
     node.create_timer(0.2, inverse_kinematics_publisher)
     rclpy.spin(node)
     rclpy.shutdown()

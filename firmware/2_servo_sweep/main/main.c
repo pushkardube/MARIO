@@ -30,6 +30,9 @@ servo_config servo_a = {		//GRIPPER
 	.min_pulse_width = CONFIG_SERVO_A_MIN_PULSEWIDTH,
 	.max_pulse_width = CONFIG_SERVO_A_MAX_PULSEWIDTH,
 	.max_degree = CONFIG_SERVO_A_MAX_DEGREE,
+	.mcpwm_num = MCPWM_UNIT_0,
+	.timer_num = MCPWM_TIMER_0,
+	.gen = MCPWM_OPR_A,
 };
 
 servo_config servo_b = {		//ELBOW
@@ -37,6 +40,9 @@ servo_config servo_b = {		//ELBOW
 	.min_pulse_width = CONFIG_SERVO_B_MIN_PULSEWIDTH,
 	.max_pulse_width = CONFIG_SERVO_B_MAX_PULSEWIDTH,
 	.max_degree = CONFIG_SERVO_B_MAX_DEGREE,
+	.mcpwm_num = MCPWM_UNIT_0,
+	.timer_num = MCPWM_TIMER_0,
+	.gen = MCPWM_OPR_B,
 };
 
 servo_config servo_c = {		//ARM
@@ -44,6 +50,9 @@ servo_config servo_c = {		//ARM
 	.min_pulse_width = CONFIG_SERVO_C_MIN_PULSEWIDTH,
 	.max_pulse_width = CONFIG_SERVO_C_MAX_PULSEWIDTH,
 	.max_degree = CONFIG_SERVO_C_MAX_DEGREE,
+	.mcpwm_num = MCPWM_UNIT_0,
+	.timer_num = MCPWM_TIMER_1,
+	.gen = MCPWM_OPR_A,
 };
 
 servo_config servo_d = {		//BASE
@@ -51,6 +60,9 @@ servo_config servo_d = {		//BASE
 	.min_pulse_width = CONFIG_SERVO_D_MIN_PULSEWIDTH,
 	.max_pulse_width = CONFIG_SERVO_D_MAX_PULSEWIDTH,
 	.max_degree = CONFIG_SERVO_D_MAX_DEGREE,
+	.mcpwm_num = MCPWM_UNIT_0,
+	.timer_num = MCPWM_TIMER_1,
+	.gen = MCPWM_OPR_B,
 };
 
 #ifdef CONFIG_ENABLE_OLED

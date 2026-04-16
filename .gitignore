@@ -57,14 +57,16 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Colcon build artifacts
+# Colcon build artifacts (root-level and nested)
+build/
+install/
+log/
 */build
 */install
 */log
 
 # End of https://www.gitignore.io/api/c
 
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

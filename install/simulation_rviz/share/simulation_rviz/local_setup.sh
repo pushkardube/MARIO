@@ -1,1 +1,0 @@
-/Users/vrushtee/MARIO/build/simulation_rviz/ament_cmake_environment_hooks/local_setup.sh

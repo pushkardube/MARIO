@@ -4,7 +4,7 @@ project(simulation_rerun)
 find_package(ament_cmake REQUIRED)
 
 install(PROGRAMS
-  scripts/rerun.py
+  scripts/arm_viz.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
