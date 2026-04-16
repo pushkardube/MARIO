@@ -1,262 +1,167 @@
 #!/usr/bin/env bash
+# MARIO — macOS installation script (Rerun + micro-ROS over USB)
+# Tested on macOS with miniforge / conda.
 
 set -e
 
-red=`tput setaf 1`
-green=`tput setaf 2`
-blue=`tput setaf 4`
-reset=`tput sgr0`
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+blue=$(tput setaf 4)
+reset=$(tput sgr0)
 
-echo "${blue}======================${reset}"
-echo "MARIO - macOS Installation Script"
-echo "${blue}======================${reset}"
+banner() { echo "${blue}=======================${reset}"; echo "$1"; echo "${blue}=======================${reset}"; }
 
 _shell_="${0##*/}"
 
-# ESP-IDF Installation
-echo "${blue}======================${reset}"
-echo "Checking ESP-IDF installation"
-echo "${blue}======================${reset}"
+# ── 1. ESP-IDF ────────────────────────────────────────────────────────────────
+banner "Checking ESP-IDF"
 
-if [ -d $HOME/esp/esp-idf ]; then
-    echo "${red}======================${reset}"
-    echo "ESP-IDF is already installed!"
-    echo "${blue}======================${reset}"
+if [ -d "$HOME/esp/esp-idf" ]; then
+    echo "${red}ESP-IDF already installed — skipping${reset}"
 else
-    echo "${blue}======================${reset}"
-    echo "Installing ESP-IDF dependencies"
-    echo "${blue}======================${reset}"
-    
-    # Check and install Homebrew if needed
-    if brew --version | grep -q 'Homebrew'; then
-        echo "Homebrew is already installed"
-    else 
-        echo "Installing homebrew..."
+    if ! brew --version &>/dev/null; then
+        echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        echo "${green}Homebrew installed successfully${reset}"
     fi
-    
-    # Install ESP-IDF dependencies
+
     brew install git cmake ninja dfu-util python3
-    
-    # Create ESP Directory
+
     mkdir -p "$HOME/esp"
-    pushd "$HOME"/esp || (echo "Error: Cannot Make Directory" && exit 1)
-
-    # Clone ESP-IDF Repository
+    cd "$HOME/esp"
     git clone -b release/v5.1 --recursive https://github.com/espressif/esp-idf.git
-    cd $HOME/esp/esp-idf
+    cd esp-idf
     ./install.sh esp32
+    . "$HOME/esp/esp-idf/export.sh"
 
-    # Check if installation is successful
-    . $HOME/esp/esp-idf/export.sh 
-    echo "${green}ESP-IDF Installation Successful${reset}"
-    
-    # Set IDF Alias
-    echo "alias get_idf='. $HOME/esp/esp-idf/export.sh'" >> $HOME/."$_shell_"rc
-    idf.py --version 
+    echo "alias get_idf='. \$HOME/esp/esp-idf/export.sh'" >> "$HOME/.$_shell_rc"
+    echo "${green}ESP-IDF installed${reset}"
 fi
 
-# Clone Mario repository if not already cloned
-echo "${blue}======================${reset}"
-echo "Checking MARIO repository"
-echo "${blue}======================${reset}"
+# ── 2. Clone MARIO ────────────────────────────────────────────────────────────
+banner "Checking MARIO repository"
 
-if [ ! -d $HOME/MARIO ]; then
-    echo "Cloning MARIO repository..."
-    cd $HOME
-    git clone -b humble --recursive https://github.com/SRA-VJTI/MARIO.git 
-    echo "${green}MARIO repository cloned successfully${reset}"
+if [ ! -d "$HOME/MARIO" ]; then
+    cd "$HOME"
+    git clone -b mac/rerun --recursive https://github.com/SRA-VJTI/MARIO.git
+    echo "${green}MARIO cloned${reset}"
 else
-    echo "${red}MARIO repository already exists. Skipping cloning.${reset}"
+    echo "${red}MARIO already exists — skipping clone${reset}"
 fi
 
-# Install Mambaforge for ROS 2
-echo "${blue}======================${reset}"
-echo "Setting up Mambaforge for ROS 2"
-echo "${blue}======================${reset}"
+# ── 3. Miniforge ──────────────────────────────────────────────────────────────
+banner "Checking Miniforge"
 
-if command -v mamba &>/dev/null; then
-    echo "Mambaforge is already installed"
+if ! command -v conda &>/dev/null; then
+    echo "Installing Miniforge..."
+    wget -q "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -O miniforge.sh
+    chmod +x miniforge.sh
+    ./miniforge.sh -b
+    rm miniforge.sh
+    export PATH="$HOME/miniforge3/bin:$PATH"
+    conda init "$_shell_"
+    echo "${green}Miniforge installed${reset}"
+    echo "Re-open your terminal after this script finishes, then re-run if needed."
+fi
+
+export PATH="$HOME/miniforge3/bin:$PATH"
+source "$HOME/miniforge3/etc/profile.d/conda.sh" 2>/dev/null || true
+
+# ── 4. ros2_mario conda environment ──────────────────────────────────────────
+banner "Setting up ros2_mario conda environment"
+
+if conda info --envs | grep -q "^ros2_mario"; then
+    echo "${red}ros2_mario env already exists — skipping create${reset}"
 else
-    echo "Installing Mambaforge..."
-    wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh -O mambaforge.sh
-    chmod +x mambaforge.sh
-    ./mambaforge.sh -b
-    rm mambaforge.sh
-    export PATH="$HOME/mambaforge/bin:$PATH"
-    mamba init --all
-    echo "${green}Mambaforge installed and initialized${reset}"
-    echo "Please reopen your terminal after this script completes to activate mambaforge."
+    conda create -n ros2_mario -y
 fi
 
-# Set up Mamba environment
-echo "${blue}======================${reset}"
-echo "Setting up ROS 2 environment with Mamba"
-echo "${blue}======================${reset}"
+conda activate ros2_mario
 
-# Ensure mamba is in the PATH
-export PATH="$HOME/mambaforge/bin:$PATH"
-
-# Install mamba in the base environment
-conda install mamba -y -c conda-forge
-
-# Create ROS environment if it doesn't exist
-if conda info --envs | grep -q "ros_env"; then
-    echo "ros_env environment already exists"
-else
-    echo "Creating ros_env environment..."
-    mamba create -n ros_env -y -c conda-forge 
-fi
-
-# Activate the environment and configure channels
-source $HOME/mambaforge/etc/profile.d/conda.sh
-conda activate ros_env
 conda config --env --add channels conda-forge
 conda config --env --add channels robostack-staging
-conda config --env --remove channels defaults || true
+conda config --env --remove channels defaults 2>/dev/null || true
 
-# Install ROS 2 and related packages
-echo "${blue}======================${reset}"
-echo "Installing ROS 2 packages (this may take a while)"
-echo "${blue}======================${reset}"
+# ── 5. ROS 2 Humble ───────────────────────────────────────────────────────────
+banner "Installing ROS 2 Humble"
 
-mamba install -y ros-humble-desktop-full
+mamba install -n ros2_mario -y \
+    ros-humble-desktop \
+    colcon-common-extensions
 
-# Install additional ROS 2 packages
-echo "${blue}======================${reset}"
-echo "Installing additioal ROS 2 packages"
-echo "${blue}======================${reset}"
+# ── 6. Python packages ────────────────────────────────────────────────────────
+banner "Installing Python packages"
 
-mamba install -n ros_env -y \
-    ros-humble-ros2-control \
-    ros-humble-joint-state-broadcaster \
-    ros-humble-joint-state-publisher \
-    ros-humble-joint-state-publisher-gui \
-    ros-humble-forward-command-controller \
-    ros-humble-robot-state-publisher \
-    ros-humble-controller-manager \
-    ros-humble-controller-manager-msgs \
-    ros-humble-joint-trajectory-controller \
-    ros-humble-xacro \
-    catkin_tools \
-    colcon-common-extensions \
-    rosdep
+conda run -n ros2_mario pip install \
+    rerun-sdk \
+    trimesh \
+    numpy \
+    mujoco \
+    pybullet \
+    pyserial
 
-# Install Python visualization dependencies (Rerun replaces RViz on Mac)
-echo "${blue}======================${reset}"
-echo "Installing Python visualization dependencies"
-echo "${blue}======================${reset}"
-
-pip install rerun-sdk trimesh numpy
-
-# Add environment activation to shell config
-if ! grep -q "conda activate ros_env" $HOME/."$_shell_"rc; then
-    echo "# Activate ROS 2 environment" >> $HOME/."$_shell_"rc
-    echo "conda activate ros_env" >> $HOME/."$_shell_"rc
+# ── 7. Shell activation ───────────────────────────────────────────────────────
+if ! grep -q "conda activate ros2_mario" "$HOME/.$_shell_rc" 2>/dev/null; then
+    echo "" >> "$HOME/.$_shell_rc"
+    echo "# MARIO — activate ROS 2 environment" >> "$HOME/.$_shell_rc"
+    echo "conda activate ros2_mario" >> "$HOME/.$_shell_rc"
 fi
 
-# Set up workspace
-echo "${blue}======================${reset}"
-echo "Setting up ROS 2 workspace"
-echo "${blue}======================${reset}"
+# ── 8. ROS 2 workspace ────────────────────────────────────────────────────────
+banner "Setting up ROS 2 workspace"
 
-if [ -d "$HOME/ros2_ws" ]; then
-    echo "ros2_ws already exists."
-else
-    echo "Creating ros2_ws..."
-    mkdir -p $HOME/ros2_ws/src
-    cd $HOME/ros2_ws
-    
-    # Ensure proper permissions
-    sudo chown -R $(whoami) $HOME/ros2_ws
-    
-    # Initial build
-    conda activate ros_env
-    colcon build
-    
-    # Add workspace setup to shell config
-    echo "# Source ROS 2 workspace" >> $HOME/."$_shell_"rc
-    echo "source $HOME/ros2_ws/install/setup.bash" >> $HOME/."$_shell_"rc
-    
-    echo "${green}ros2_ws successfully setup${reset}"
+if [ ! -d "$HOME/ros2_ws" ]; then
+    mkdir -p "$HOME/ros2_ws/src"
 fi
 
-# Copy MARIO folders to ros2_ws
-echo "${blue}======================${reset}"
-echo "Setting up MARIO packages"
-echo "${blue}======================${reset}"
+cd "$HOME/ros2_ws/src"
 
-cd $HOME/ros2_ws/src
-if [[ ! -d "1_chatter_listener" ]]; then
-    echo "Copying MARIO's folders to ros2_ws..."
-    cp -r $HOME/MARIO/1_* $HOME/ros2_ws/src
-    cp -r $HOME/MARIO/2_* $HOME/ros2_ws/src
-    cp -r $HOME/MARIO/3_* $HOME/ros2_ws/src
-    cp -r $HOME/MARIO/4_* $HOME/ros2_ws/src
-    cp -r $HOME/MARIO/activities $HOME/ros2_ws/src
-    
-    if [[ ! -d "$HOME/ros2_ws_firmware" ]]; then
-        mkdir -p $HOME/ros2_ws_firmware
-        cp -r $HOME/MARIO/firmware/* $HOME/ros2_ws_firmware
-        echo "${green}Firmware copied to ros2_ws_firmware${reset}"
-    else 
-        echo "${green}Firmware directory already exists${reset}"
+for pkg in 1_chatter_listener 2_simulation_dh 3_simulation_rerun; do
+    if [ ! -d "$pkg" ]; then
+        cp -r "$HOME/MARIO/$pkg" .
     fi
-else
-    echo "${green}ROS folders are already copied${reset}"
+done
+
+cd "$HOME/ros2_ws"
+conda run -n ros2_mario colcon build
+
+if ! grep -q "ros2_ws/install/setup" "$HOME/.$_shell_rc" 2>/dev/null; then
+    echo "source \$HOME/ros2_ws/install/setup.bash" >> "$HOME/.$_shell_rc"
 fi
 
-# Build the workspace
-echo "${blue}======================${reset}"
-echo "Building the workspace"
-echo "${blue}======================${reset}"
+echo "${green}Workspace built${reset}"
 
-cd $HOME/ros2_ws
-conda activate ros_env
-colcon build
-
-# Set up micro-ROS Agent natively (no Docker needed)
-# On macOS, Docker Desktop cannot pass through USB devices, so we build
-# Micro-XRCE-DDS-Agent (the same underlying tool) natively using Homebrew.
-# This supports wired serial transport via USB.
-echo "${blue}======================${reset}"
-echo "Setting up micro-ROS Agent (native, wired USB support)"
-echo "${blue}======================${reset}"
+# ── 9. micro-ROS Agent (native, wired USB) ────────────────────────────────────
+banner "Installing micro-ROS Agent (native)"
 
 brew install asio tinyxml2 openssl
 
 if [ ! -d "$HOME/Micro-XRCE-DDS-Agent" ]; then
-    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git $HOME/Micro-XRCE-DDS-Agent
+    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git "$HOME/Micro-XRCE-DDS-Agent"
 fi
 
-cd $HOME/Micro-XRCE-DDS-Agent
-cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DUAGENT_USE_SYSTEM_LOGGER=ON \
-    -DOPENSSL_ROOT_DIR=$(brew --prefix openssl)
+cd "$HOME/Micro-XRCE-DDS-Agent"
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release \
+    -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)"
 cmake --build build --parallel
 sudo cmake --install build
 
-echo "${green}MicroXRCEAgent installed.${reset}"
-echo ""
-echo "To start the micro-ROS agent (wired USB serial), run:"
-echo "  MicroXRCEAgent serial --dev /dev/cu.usbserial-* -b 115200"
-echo "(replace /dev/cu.usbserial-* with the actual port shown in 'ls /dev/cu.*')"
-
-# Add microros_agent alias to shell config
-if ! grep -q "alias microros_agent" $HOME/."$_shell_"rc; then
-    echo "" >> $HOME/."$_shell_"rc
-    echo "# Start micro-ROS agent for MARIO (wired USB serial)" >> $HOME/."$_shell_"rc
-    echo "alias microros_agent='MicroXRCEAgent serial --dev \$(ls /dev/cu.usbserial-* /dev/cu.SLAB_USBtoUART 2>/dev/null | head -1) -b 115200'" >> $HOME/."$_shell_"rc
+if ! grep -q "alias microros_agent" "$HOME/.$_shell_rc" 2>/dev/null; then
+    echo "" >> "$HOME/.$_shell_rc"
+    echo "# MARIO — start micro-ROS agent over wired USB" >> "$HOME/.$_shell_rc"
+    echo "alias microros_agent='MicroXRCEAgent serial --dev \$(ls /dev/cu.usbserial-* /dev/cu.SLAB_USBtoUART 2>/dev/null | head -1) -b 115200'" >> "$HOME/.$_shell_rc"
 fi
 
-# Note about Ignition/Gazebo
-echo "${blue}======================${reset}"
-echo "Note about Ignition/Gazebo on macOS"
-echo "${blue}======================${reset}"
-echo "Ignition Fortress is not fully supported on macOS through conda packages."
-echo "Use a Linux VM or dual boot for Gazebo simulation."
+echo "${green}MicroXRCEAgent installed${reset}"
 
-echo "${green}======================${reset}"
-echo "Installation completed successfully!"
-echo "Please restart your terminal to apply all changes."
-echo "${green}======================${reset}"
+# ── Done ──────────────────────────────────────────────────────────────────────
+echo ""
+echo "${green}=======================${reset}"
+echo "Installation complete."
+echo "Restart your terminal, then:"
+echo "  1. colcon build --packages-select simulation_rerun"
+echo "  2. source install/setup.zsh"
+echo "  3. ros2 run simulation_rerun rviz.py"
+echo ""
+echo "To start the micro-ROS agent:  microros_agent"
+echo "  (or: MicroXRCEAgent serial --dev /dev/cu.usbserial-XXXX -b 115200)"
+echo "${green}=======================${reset}"

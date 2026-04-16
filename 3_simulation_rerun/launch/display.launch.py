@@ -16,9 +16,9 @@ def generate_launch_description():
     ####### DATA INPUT ##########
     urdf_file = 'manipulator.urdf'
     #xacro_file = "box_bot.xacro"robot_description
-    package_description = "simulation_rviz"
+    package_description = "simulation_rerun"
     ####### DATA INPUT END ##########
-    config = os.path.join( get_package_share_directory('simulation_rviz'),
+    config = os.path.join( get_package_share_directory('simulation_rerun'),
     'config',
     'manipulator.yaml'
     )

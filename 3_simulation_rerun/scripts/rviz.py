@@ -12,7 +12,7 @@ from std_msgs.msg import Header
 from pathlib import Path
 from ament_index_python.packages import get_package_share_directory
 
-MESH_DIR = Path(get_package_share_directory("simulation_rviz")) / "meshes"
+MESH_DIR = Path(get_package_share_directory("simulation_rerun")) / "meshes"
 
 # Physical limit of the gripper mechanism — servo can go to 180° electrically but
 # the claw hits a hard stop well before that. Increase slowly until servo stops fighting.
