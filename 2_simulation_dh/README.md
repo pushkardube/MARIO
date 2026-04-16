@@ -44,7 +44,7 @@ This demo provides a visual representation of the DH parameters using RViz, ROS 
 
 4. Source the workspace:
    ```bash
-   source install/setup.bash
+   source install/setup.zsh
    ```
 
 ### Running the Simulation

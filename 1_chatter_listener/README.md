@@ -6,7 +6,7 @@ This project demonstrates basic ROS 2 publisher-subscriber communication using a
 ## Prerequisites
 - ROS 2 installed and configured
 - Working ROS 2 workspace (`ros2_ws`)
-- MARIO repository cloned
+- MARIO repository c:argdo %s/setup\.bash/setup.zsh/g | updateloned
 
 ## Installation
 
@@ -27,20 +27,20 @@ This project demonstrates basic ROS 2 publisher-subscriber communication using a
 
 4. Source the workspace:
    ```bash
-   source install/setup.bash
+   source install/setup.zsh
    ```
 
 ## Running the Demo
 
 ### Terminal 1 - Talker (Publisher)
 ```bash
-source ~/ros2_ws/install/setup.bash
+source ~/ros2_ws/install/setup.zsh
 ros2 run chatter_listener talker.py
 ```
 
 ### Terminal 2 - Listener (Subscriber)
 ```bash
-source ~/ros2_ws/install/setup.bash
+source ~/ros2_ws/install/setup.zsh
 ros2 run chatter_listener listener.py
 ```
 

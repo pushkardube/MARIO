@@ -19,7 +19,7 @@ colcon build
 ```
 Then source it
 ```
-source install/setup.bash
+source install/setup.zsh
 ```
 To make a circle first we need to open turtlesim_node so run
 ```
@@ -27,7 +27,7 @@ ros2 run turtlesim turtlesim_node
 ```
 Then we need to `open other terminal` and source it
 ```
-source install/setup.bash
+source install/setup.zsh
 ```
 Then Run
 ```

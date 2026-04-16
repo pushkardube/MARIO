@@ -7,7 +7,7 @@ If you have not installed the joint_state_publishers and ros_control for ros-noe
 
 * Remember : Whenever you are using ros commands in another terminal , make sure you  source the ros commands:
 ```
-source install/setup.bash
+source install/setup.zsh
 ```
 
 
@@ -36,11 +36,11 @@ sudo apt install ros-<your_version_of_ros>-joint-state-publisher-gui
 *  For command line input
 
 ```
-ros2 launch simulation_rerun rviz.launch.py
+ros2 launch simulation_rerun rerun.launch.py
 ```
 * To give input angles from command line
 ```
-ros2 run simulation_rerun rviz.py
+ros2 run simulation_rerun rerun.py
 ```
 
 *you can use this command to view the topics actively published. This will show if the values are published to the topic we want to.

@@ -18,7 +18,7 @@ This project demonstrates the integration of ESP32 with RViz using micro-ROS, al
 Start the micro-ROS agent:
 ```bash
 cd ros2_ws
-source install/setup.bash
+source install/setup.zsh
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 ```
 
@@ -26,7 +26,7 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 
 1. Navigate to project directory:
    ```bash
-   cd ros2_ws_firmware/3_microros_rviz
+   cd ros2_ws_firmware/3_microros_rerun
    ```
 
 2. Source ESP-IDF:
@@ -53,8 +53,8 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 1. Navigate to ROS 2 workspace:
    ```bash
    cd ros2_ws
-   source install/setup.bash
-   ros2 run simulation_rviz rviz.py
+   source install/setup.zsh
+   ros2 run simulation_rerun rerun.py
    ```
 
 ## Option 2: PC Hotspot
@@ -75,7 +75,7 @@ The PC hotspot IP is typically `10.42.0.1`.
 ### Terminal 2: Start Micro-ROS Agent
 ```bash
 cd ros2_ws
-source install/setup.bash
+source install/setup.zsh
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
 ```
 
@@ -83,7 +83,7 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
 
 1. Navigate to project directory:
    ```bash
-   cd ros2_ws_firmware/3_microros_rviz
+   cd ros2_ws_firmware/3_microros_rerun
    ```
 
 2. Source ESP-IDF:
@@ -110,8 +110,8 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
 ### Terminal 4: Launch RViz Visualization
 ```bash
 cd ros2_ws
-source install/setup.bash
-ros2 run simulation_rviz rviz.py
+source install/setup.zsh
+ros2 run simulation_rerun rerun.py
 ```
 
 > **Note:** If the ESP32 fails to connect, try pressing the reset button on the SRA board after the agent is running.
@@ -128,7 +128,7 @@ sudo apt install net-tools
 ### Script Execution Issues
 If the script isn't executable, set permissions:
 ```bash
-sudo chmod +x rviz.py
+sudo chmod +x rerun.py
 ```
 
 ### Common Issues

@@ -42,7 +42,7 @@ def generate_launch_description():
         output="screen"
     )
 
-    rviz_launch = Node(
+    rerun_launch = Node(
             package='rviz2',
             namespace='',
             executable='rviz2',
@@ -88,6 +88,6 @@ def generate_launch_description():
 
         tf2_link1,tf2_link2,tf2_link3,tf2_claw_left,tf2_claw_right,
         robot_state_publisher_node,
-        rviz_launch,
+        rerun_launch,
         joint_state_publisher,
     ])

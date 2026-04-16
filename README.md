@@ -34,14 +34,13 @@ Given below are instructions for ROS2-Humble and micro-ROS installations. For RO
 ## File Structure 
     ├── 1_chatter_listener                        # talker and listener script to understand the nodes and communications in ROS
     ├── 2_simulation_dh                           # simulation of DH parameters
-    ├── 3_simulation_rviz                         # simulation of MARIO bot on rviz
-    ├── 4_simulation_gazebo                       # simulation of MARIO bot on gazebo
+    ├── 3_simulation_rerun                        # simulation of MARIO bot on rerun
     ├── 5_simulation_mujoco                       # simulation of MARIO bot on mujoco
     ├── assets                                    # contains necessary gifs, images
     ├── firmware                                  # contains ESP-IDF examples for controlling servo motors and micro-ROS
     │   ├── 1_servo_set_zero                      # example in ESP-IDF to set angles of all servo motor zero
     │   ├── 2_servo_sweep                         # example in ESP-IDF to set variable angles in servo motor
-    │   ├── 3_microros_rviz                       # example in ESP-IDF to interface with rviz environment as well as ESP32
+    │   ├── 3_microros_rerun                       # example in ESP-IDF to interface with rerun environment as well as ESP32
     │   ├── 4_microros_gazebo                     # example in ESP-IDF to interface with gazebo environment as well as ESP32
     │   ├── 5_servo_test_webserver                # example in ESP-IDF to set angles of servo over the webserver interface
     │   └── components                            # contains all the dependencies required for the above examples

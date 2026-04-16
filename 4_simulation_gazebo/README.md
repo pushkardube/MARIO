@@ -24,7 +24,7 @@ We will be testing out 2 scripts (forward_kinematics.py, inverse_kinematics.py).
 Source Ros2. Use following commands in your workspace :
 
 ```
-source /opt/ros/humble/setup.bash
+source /opt/ros/humble/setup.zsh
 ```
 Now we build simulation_gazebo package using this command:
 
@@ -33,7 +33,7 @@ colcon build
 ```
 Now we source the workspace using following command :
 ```
-source install/setup.bash
+source install/setup.zsh
 ```
 For running the scripts on gazebo, firstly launch gazebo world using the command
 
@@ -45,7 +45,7 @@ After starting gazebo we will be testing out `forward_kinematics.py`.
 Open a fresh terminal and navigate to your workspace. Now source the workspace and run forward_kinematics.py using following commands :
 
 ```
-source install/setup.bash
+source install/setup.zsh
 ros2 run simulation_gazebo forward_kinematics.py
 ```
 Similarly, you can test out the script for `inverse_kinematics.py`.

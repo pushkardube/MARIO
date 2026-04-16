@@ -19,7 +19,7 @@ Navigate to micro-ROS workspace and start the agent:
 ```bash
 cd ros2_ws
 colcon build
-source install/setup.bash
+source install/setup.zsh
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 ```
 
@@ -55,14 +55,14 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
 1. Start Gazebo simulation:
    ```bash
    cd ros2_ws
-   source install/setup.bash
+   source install/setup.zsh
    ros2 launch simulation_gazebo basic_gazebo.launch.py
    ```
 
 2. Run kinematics node (in a new terminal):
    ```bash
    cd ros2_ws
-   source install/setup.bash
+   source install/setup.zsh
    ros2 run simulation_gazebo forward_kinematics.py
    ```
 
@@ -84,7 +84,7 @@ The PC hotspot IP is typically `10.42.0.1`.
 ### Terminal 2: Start Micro-ROS Agent
 ```bash
 cd ros2_ws
-source install/setup.bash
+source install/setup.zsh
 ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
 ```
 
@@ -119,14 +119,14 @@ ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 -v6
 ### Terminal 4: Launch Simulation and FK Node
 ```bash
 cd ros2_ws
-source install/setup.bash
+source install/setup.zsh
 ros2 launch simulation_gazebo basic_gazebo.launch.py
 ```
 
 In a new terminal:
 ```bash
 cd ros2_ws
-source install/setup.bash
+source install/setup.zsh
 ros2 run simulation_gazebo forward_kinematics.py
 ```
 

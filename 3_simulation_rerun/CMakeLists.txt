@@ -4,7 +4,7 @@ project(simulation_rerun)
 find_package(ament_cmake REQUIRED)
 
 install(PROGRAMS
-  scripts/rviz.py
+  scripts/rerun.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
