@@ -11,7 +11,7 @@ reset=$(tput sgr0)
 
 banner() { echo "${blue}=======================${reset}"; echo "$1"; echo "${blue}=======================${reset}"; }
 
-_shell_="${0##*/}"
+_shell_=$(basename "$SHELL")   # zsh or bash — used for rc file name
 
 # ── 1. ESP-IDF ────────────────────────────────────────────────────────────────
 banner "Checking ESP-IDF"
@@ -33,7 +33,7 @@ else
     ./install.sh esp32
     . "$HOME/esp/esp-idf/export.sh"
 
-    echo "alias get_idf='. \$HOME/esp/esp-idf/export.sh'" >> "$HOME/.$_shell_rc"
+    echo "alias get_idf='. \$HOME/esp/esp-idf/export.sh'" >> "$HOME/.${_shell_}rc"
     echo "${green}ESP-IDF installed${reset}"
 fi
 
@@ -53,7 +53,7 @@ banner "Checking Miniforge"
 
 if ! command -v conda &>/dev/null; then
     echo "Installing Miniforge..."
-    wget -q "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -O miniforge.sh
+    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -o miniforge.sh
     chmod +x miniforge.sh
     ./miniforge.sh -b
     rm miniforge.sh
@@ -63,8 +63,10 @@ if ! command -v conda &>/dev/null; then
     echo "Re-open your terminal after this script finishes, then re-run if needed."
 fi
 
-export PATH="$HOME/miniforge3/bin:$PATH"
-source "$HOME/miniforge3/etc/profile.d/conda.sh" 2>/dev/null || true
+# Find conda wherever it is installed
+CONDA_BASE=$(conda info --base 2>/dev/null || echo "$HOME/miniforge3")
+export PATH="$CONDA_BASE/bin:$PATH"
+source "$CONDA_BASE/etc/profile.d/conda.sh" 2>/dev/null || true
 
 # ── 4. ros2_mario conda environment ──────────────────────────────────────────
 banner "Setting up ros2_mario conda environment"
@@ -100,32 +102,39 @@ conda run -n ros2_mario pip install \
     pyserial
 
 # ── 7. Shell activation ───────────────────────────────────────────────────────
-if ! grep -q "conda activate ros2_mario" "$HOME/.$_shell_rc" 2>/dev/null; then
-    echo "" >> "$HOME/.$_shell_rc"
-    echo "# MARIO — activate ROS 2 environment" >> "$HOME/.$_shell_rc"
-    echo "conda activate ros2_mario" >> "$HOME/.$_shell_rc"
+if ! grep -q "conda activate ros2_mario" "$HOME/.${_shell_}rc" 2>/dev/null; then
+    echo "" >> "$HOME/.${_shell_}rc"
+    echo "# MARIO — activate ROS 2 environment" >> "$HOME/.${_shell_}rc"
+    echo "conda activate ros2_mario" >> "$HOME/.${_shell_}rc"
 fi
 
 # ── 8. ROS 2 workspace ────────────────────────────────────────────────────────
 banner "Setting up ROS 2 workspace"
 
-if [ ! -d "$HOME/ros2_ws" ]; then
-    mkdir -p "$HOME/ros2_ws/src"
-fi
-
-cd "$HOME/ros2_ws/src"
+# Workspace lives outside the repo so build/install/log don't pollute the source.
+# Packages are symlinked — Python edits take effect without rebuilding.
+mkdir -p "$HOME/ros2_mario_ws/src"
+cd "$HOME/ros2_mario_ws/src"
 
 for pkg in 1_chatter_listener 2_simulation_dh 3_simulation_rerun; do
-    if [ ! -d "$pkg" ]; then
-        cp -r "$HOME/MARIO/$pkg" .
+    if [ ! -L "$pkg" ]; then
+        ln -s "$HOME/MARIO/$pkg" "$pkg"
+        echo "  linked: $pkg"
+    else
+        echo "  already linked: $pkg"
     fi
 done
 
-cd "$HOME/ros2_ws"
-conda run -n ros2_mario colcon build
+# Ensure all Python scripts and launch files are executable (required for ros2 run)
+find "$HOME/MARIO" \( -path "*/scripts/*.py" -o -path "*/launch/*.py" \) -exec chmod +x {} \;
 
-if ! grep -q "ros2_ws/install/setup" "$HOME/.$_shell_rc" 2>/dev/null; then
-    echo "source \$HOME/ros2_ws/install/setup.bash" >> "$HOME/.$_shell_rc"
+cd "$HOME/ros2_mario_ws"
+conda run -n ros2_mario colcon build --symlink-install
+
+if ! grep -q "ros2_mario_ws/install/setup" "$HOME/.${_shell_}rc" 2>/dev/null; then
+    echo "" >> "$HOME/.${_shell_}rc"
+    echo "# MARIO — source ROS 2 workspace" >> "$HOME/.${_shell_}rc"
+    echo "source \$HOME/ros2_mario_ws/install/setup.sh" >> "$HOME/.${_shell_}rc"
 fi
 
 echo "${green}Workspace built${reset}"
@@ -145,10 +154,10 @@ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release \
 cmake --build build --parallel
 sudo cmake --install build
 
-if ! grep -q "alias microros_agent" "$HOME/.$_shell_rc" 2>/dev/null; then
-    echo "" >> "$HOME/.$_shell_rc"
-    echo "# MARIO — start micro-ROS agent over wired USB" >> "$HOME/.$_shell_rc"
-    echo "alias microros_agent='MicroXRCEAgent serial --dev \$(ls /dev/cu.usbserial-* /dev/cu.SLAB_USBtoUART 2>/dev/null | head -1) -b 115200'" >> "$HOME/.$_shell_rc"
+if ! grep -q "alias microros_agent" "$HOME/.${_shell_}rc" 2>/dev/null; then
+    echo "" >> "$HOME/.${_shell_}rc"
+    echo "# MARIO — start micro-ROS agent over wired USB" >> "$HOME/.${_shell_}rc"
+    echo "alias microros_agent='MicroXRCEAgent serial --dev \$(ls /dev/cu.usbserial-* /dev/cu.SLAB_USBtoUART 2>/dev/null | head -1) -b 115200'" >> "$HOME/.${_shell_}rc"
 fi
 
 echo "${green}MicroXRCEAgent installed${reset}"
@@ -158,9 +167,9 @@ echo ""
 echo "${green}=======================${reset}"
 echo "Installation complete."
 echo "Restart your terminal, then:"
-echo "  1. colcon build --packages-select simulation_rerun"
-echo "  2. source install/setup.zsh"
-echo "  3. ros2 run simulation_rerun rerun.py"
+echo "  cd ~/ros2_mario_ws && source install/setup.sh"
+echo "  ros2 run simulation_rerun rerun.py"
+echo "  ros2 run chatter_listener talker.py"
 echo ""
 echo "To start the micro-ROS agent:  microros_agent"
 echo "  (or: MicroXRCEAgent serial --dev /dev/cu.usbserial-XXXX -b 115200)"
