@@ -1,0 +1,65 @@
+Step 1: Install Homebrew (if not already there)
+
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  Step 2: Install Miniforge (just a conda installer, one-time)
+
+  brew install miniforge
+  conda init zsh
+  Then restart your terminal.
+
+  Step 3: Create the conda env from the lockfile
+
+  cd ~/MARIO
+  conda env create -f environment.yml
+  conda activate ros2_mario
+
+  Step 4: Setup ROS 2 workspace
+
+  mkdir -p ~/ros2_mario_ws/src
+  cd ~/ros2_mario_ws/src
+  ln -s ~/MARIO/1_chatter_listener 1_chatter_listener
+  ln -s ~/MARIO/2_simulation_dh 2_simulation_dh
+  ln -s ~/MARIO/3_simulation_rerun 3_simulation_rerun
+  cd ~/ros2_mario_ws
+  colcon build --symlink-install
+  source install/setup.zsh
+
+  Step 5: Install ESP-IDF (for flashing ESP32 only — do this SEPARATELY, never inside conda)
+
+  conda deactivate
+  mkdir -p ~/esp && cd ~/esp
+  git clone -b release/v5.1 --recursive https://github.com/espressif/esp-idf.git
+  cd esp-idf
+  ./install.sh esp32
+  Important: ESP-IDF has its own Python. Never run . ~/esp/esp-idf/export.sh while conda is active — that's what breaks things. When you need to flash:
+  conda deactivate
+  . ~/esp/esp-idf/export.sh
+  cd ~/MARIO/firmware/3_microros_rerun
+  idf.py build flash monitor
+  When you're done flashing, close that terminal and open a new one with conda activate ros2_mario.
+
+  Step 6: Build Micro-XRCE-DDS-Agent (the micro-ROS bridge)
+
+  brew install asio tinyxml2 openssl cmake
+  git clone -b v2.3.0 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git ~/Micro-XRCE-DDS-Agent
+  cd ~/Micro-XRCE-DDS-Agent
+  cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)"
+  cmake --build build --parallel
+  sudo cmake --install build
+
+  Step 7: Add these to your ~/.zshrc
+
+  conda activate ros2_mario
+  source ~/ros2_mario_ws/install/setup.zsh
+  alias microros_agent='MicroXRCEAgent serial --dev $(ls /dev/cu.usbserial-* /dev/cu.SLAB_USBtoUART 2>/dev/null | head -1) -b 115200'
+  alias get_idf='. $HOME/esp/esp-idf/export.sh'
+
+  ---
+  To run (two terminals):
+
+  Terminal 1 — start the micro-ROS agent:
+  microros_agent
+
+  Terminal 2 — run the arm script:
+  ros2 run simulation_rerun arm_viz
